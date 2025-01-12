@@ -12,8 +12,7 @@ if (!requireNamespace("dplyr", quietly = TRUE)) install.packages("dplyr")
 install.packages("corrplot")     # For correlation plot
 install.packages("ggplot2")      # For data visualization
 
-# Load the packages after installation
-library(corrplot)
+
 library(ggplot2)
 
 data <- read.csv("est16us.csv", header = TRUE)
