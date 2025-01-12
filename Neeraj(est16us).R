@@ -4,6 +4,7 @@ getwd()
 
 
 install.packages("tzdb")
+# Installing and Loading necessary libraries
 if (!requireNamespace("readr", quietly = TRUE)) install.packages("readr")
 if (!requireNamespace("ggplot2", quietly = TRUE)) install.packages("ggplot2")
 if (!requireNamespace("dplyr", quietly = TRUE)) install.packages("dplyr")
@@ -12,7 +13,8 @@ if (!requireNamespace("dplyr", quietly = TRUE)) install.packages("dplyr")
 install.packages("corrplot")     # For correlation plot
 install.packages("ggplot2")      # For data visualization
 
-
+# Load the packages after installation
+library(corrplot)
 library(ggplot2)
 
 data <- read.csv("est16us.csv", header = TRUE)
@@ -23,7 +25,7 @@ data <- data[-1, ]
 
 head(data)
 
-
+# Rename the columns as specified
 colnames(data) <- c(
   "State FIPS Code",
   "Postal Code",
@@ -71,7 +73,7 @@ colnames(data) <- make.unique(colnames(data))
 # Convert appropriate columns to numeric while preserving column names
 data <- data %>%
   mutate(across(
-    .cols = -c(`State FIPS Code`, `Postal Code`, Name), # Exclude non-numeric columns
+    .cols = -c(State FIPS Code, Postal Code, Name), # Exclude non-numeric columns
     .fns = ~ as.numeric(.),                            # Convert to numeric
     .names = "{.col}"                                  # Keep original column names
   ))
@@ -101,10 +103,10 @@ str(data)
 ######################
 ###################
 
-#Question-1
+#Question-1(A)
 
 # Scatterplot with Linear Trendline
-scatterplot <- ggplot(data, aes(x = `Median Household Income (Age 5-17 in Families)`, y = `Poverty Percent (All Ages)`)) +
+scatterplot <- ggplot(data, aes(x = Median Household Income (Age 5-17 in Families), y = Poverty Percent (All Ages))) +
   geom_point(color = "blue", alpha = 0.7) +
   geom_smooth(method = "lm", color = "red", se = TRUE) +
   labs(
@@ -118,14 +120,16 @@ scatterplot <- ggplot(data, aes(x = `Median Household Income (Age 5-17 in Famili
 print(scatterplot)
 
 
+#Question-1(B)
+
 ##Histogram
 
 # Histogram with Normal Curve Overlay
 # Calculate mean and standard deviation for the normal curve
-mean_poverty <- mean(data$`Poverty Percent (All Ages)`, na.rm = TRUE)
-sd_poverty <- sd(data$`Poverty Percent (All Ages)`, na.rm = TRUE)
+mean_poverty <- mean(data$Poverty Percent (All Ages), na.rm = TRUE)
+sd_poverty <- sd(data$Poverty Percent (All Ages), na.rm = TRUE)
 
-histogram <- ggplot(data, aes(x = `Poverty Percent (All Ages)`)) +
+histogram <- ggplot(data, aes(x = Poverty Percent (All Ages))) +
   geom_histogram(aes(y = after_stat(density)), bins = 30, color = "black", fill = "skyblue", alpha = 0.7) +
   stat_function(
     fun = dnorm,
@@ -146,15 +150,15 @@ print(histogram)
 
 
 
-#Question-2
+#Question-2(A)
 
 library(ggplot2)
 
 ##Boxplot
 
 # Creating the boxplot
-ggplot(data, aes(x = cut(`Median Household Income (Age 5-17 in Families)`, breaks = 4), 
-                 y = `Poverty Percent (All Ages)`)) +
+ggplot(data, aes(x = cut(Median Household Income (Age 5-17 in Families), breaks = 4), 
+                 y = Poverty Percent (All Ages))) +
   geom_boxplot() +
   labs(title = "Poverty Percent by Median Household Income (Age 5-17 in Families)", 
        x = "Median Household Income (Age 5-17 in Families)", 
@@ -163,12 +167,14 @@ ggplot(data, aes(x = cut(`Median Household Income (Age 5-17 in Families)`, break
 
 
 
+#Question-2(B)
+
 ##Histogram
 
 library(ggplot2)
 
 # Creating the histogram with normal curve overlay
-histogram <- ggplot(data, aes(x = `Poverty Percent (All Ages)`)) +
+histogram <- ggplot(data, aes(x = Poverty Percent (All Ages))) +
   geom_histogram(aes(y = after_stat(density)), bins = 30, color = "black", fill = "white", alpha = 0.7) +
   stat_function(
     fun = dnorm,
@@ -183,23 +189,24 @@ histogram <- ggplot(data, aes(x = `Poverty Percent (All Ages)`)) +
   ) +
   theme_minimal()
 
+# Print the histogram
+print(histogram)
 
 
 
-
-#Question-3
+#Question-3(a)
 
 library(ggplot2)
 
 # Normalizing the data
 data_normalized <- data
-data_normalized$`Poverty Percent (All Ages)` <- data_normalized$`Poverty Percent (All Ages)` / sum(data_normalized$`Poverty Percent (All Ages)`) * 100
+data_normalized$Poverty Percent (All Ages) <- data_normalized$Poverty Percent (All Ages) / sum(data_normalized$Poverty Percent (All Ages)) * 100
 
 # Creating the normalized stacked bar chart
 ggplot(data_normalized, 
-       aes(x = cut(`Median Household Income (Age 5-17 in Families)`, breaks = 4), 
-           y = `Poverty Percent (All Ages)`, 
-           fill = cut(`Median Household Income (Age 5-17 in Families)`, breaks = 4))) +
+       aes(x = cut(Median Household Income (Age 5-17 in Families), breaks = 4), 
+           y = Poverty Percent (All Ages), 
+           fill = cut(Median Household Income (Age 5-17 in Families), breaks = 4))) +
   geom_bar(stat = "identity") +
   labs(title = "Comparison of Poverty Percent by Median Household Income", 
        x = "Median Household Income Categories", 
@@ -211,9 +218,7 @@ ggplot(data_normalized,
 
 
 
-##Part-2 Analysis.
-
-#Question-4
+#Question-3(B)
 
 # Load necessary library
 library(ggplot2)
@@ -221,28 +226,28 @@ library(ggpubr)
 
 # Check for normality of the variables
 # Histogram with a normal curve overlay for Median Household Income
-ggplot(data, aes(x = `Median Household Income (Age 5-17 in Families)`)) +
+ggplot(data, aes(x = Median Household Income (Age 5-17 in Families))) +
   geom_histogram(aes(y = ..density..), bins = 30, fill = "skyblue", color = "black", alpha = 0.7) +
-  stat_function(fun = dnorm, args = list(mean = mean(data$`Median Household Income (Age 5-17 in Families)`, na.rm = TRUE), 
-                                         sd = sd(data$`Median Household Income (Age 5-17 in Families)`, na.rm = TRUE)), 
+  stat_function(fun = dnorm, args = list(mean = mean(data$Median Household Income (Age 5-17 in Families), na.rm = TRUE), 
+                                         sd = sd(data$Median Household Income (Age 5-17 in Families), na.rm = TRUE)), 
                 color = "blue", size = 1) +
   labs(title = "Histogram of Median Household Income with Normal Curve",
        x = "Median Household Income (Age 5-17 in Families)",
        y = "Density")
 
 # Histogram with a normal curve overlay for Poverty Percent
-ggplot(data, aes(x = `Poverty Percent (All Ages)`)) +
+ggplot(data, aes(x = Poverty Percent (All Ages))) +
   geom_histogram(aes(y = ..density..), bins = 30, fill = "lightgreen", color = "black", alpha = 0.7) +
-  stat_function(fun = dnorm, args = list(mean = mean(data$`Poverty Percent (All Ages)`, na.rm = TRUE), 
-                                         sd = sd(data$`Poverty Percent (All Ages)`, na.rm = TRUE)), 
+  stat_function(fun = dnorm, args = list(mean = mean(data$Poverty Percent (All Ages), na.rm = TRUE), 
+                                         sd = sd(data$Poverty Percent (All Ages), na.rm = TRUE)), 
                 color = "blue", size = 1) +
   labs(title = "Histogram of Poverty Percent with Normal Curve",
        x = "Poverty Percent (All Ages)",
        y = "Density")
 
 # Perform Shapiro-Wilk test for normality
-shapiro_income <- shapiro.test(data$`Median Household Income (Age 5-17 in Families)`)
-shapiro_poverty <- shapiro.test(data$`Poverty Percent (All Ages)`)
+shapiro_income <- shapiro.test(data$Median Household Income (Age 5-17 in Families))
+shapiro_poverty <- shapiro.test(data$Poverty Percent (All Ages))
 
 # Print results
 print(shapiro_income)
@@ -251,14 +256,14 @@ print(shapiro_poverty)
 # Correlation based on normality
 if (shapiro_income$p.value > 0.05 & shapiro_poverty$p.value > 0.05) {
   # Both variables are normally distributed, use Pearson's r
-  correlation <- cor.test(data$`Median Household Income (Age 5-17 in Families)`, 
-                          data$`Poverty Percent (All Ages)`, 
+  correlation <- cor.test(data$Median Household Income (Age 5-17 in Families), 
+                          data$Poverty Percent (All Ages), 
                           method = "pearson")
   print("Using Pearson's r for correlation")
 } else {
   # At least one variable is not normally distributed, use Spearman's Rho
-  correlation <- cor.test(data$`Median Household Income (Age 5-17 in Families)`, 
-                          data$`Poverty Percent (All Ages)`, 
+  correlation <- cor.test(data$Median Household Income (Age 5-17 in Families), 
+                          data$Poverty Percent (All Ages), 
                           method = "spearman")
   print("Using Spearman's Rho for correlation")
 }
@@ -269,30 +274,30 @@ print(correlation)
 
 
 
-#Question-5
+#Question-4
 
 # Check for normality of 'Poverty Percent (All Ages)'
-shapiro_poverty <- shapiro.test(data$`Poverty Percent (All Ages)`)
+shapiro_poverty <- shapiro.test(data$Poverty Percent (All Ages))
 
 # If p-value > 0.05, use parametric test (e.g., t-test), otherwise use non-parametric test (e.g., Wilcoxon)
 if (shapiro_poverty$p.value > 0.05) {
   print("Using t-test for 'Poverty Percent (All Ages)'")
   # Perform t-test
-  result <- t.test(data$`Poverty Percent (All Ages)` ~ 1)
+  result <- t.test(data$Poverty Percent (All Ages) ~ 1)
 } else {
   print("Using Wilcoxon test for 'Poverty Percent (All Ages)'")
   # Perform Wilcoxon test
-  result <- wilcox.test(data$`Poverty Percent (All Ages)` ~ 1)
+  result <- wilcox.test(data$Poverty Percent (All Ages) ~ 1)
 }
 
 # Print the result of the test
 print(result)
 
 # Visualization: Histogram with Normal Curve Overlay for 'Poverty Percent (All Ages)'
-mean_poverty <- mean(data$`Poverty Percent (All Ages)`, na.rm = TRUE)
-sd_poverty <- sd(data$`Poverty Percent (All Ages)`, na.rm = TRUE)
+mean_poverty <- mean(data$Poverty Percent (All Ages), na.rm = TRUE)
+sd_poverty <- sd(data$Poverty Percent (All Ages), na.rm = TRUE)
 
-histogram <- ggplot(data, aes(x = `Poverty Percent (All Ages)`)) +
+histogram <- ggplot(data, aes(x = Poverty Percent (All Ages))) +
   geom_histogram(aes(y = after_stat(density)), bins = 30, color = "black", fill = "skyblue", alpha = 0.7) +
   stat_function(
     fun = dnorm,
@@ -314,7 +319,7 @@ print(histogram)
 
 
 
-#Question-6
+#Question-5
 
 # Load necessary libraries
 library(dplyr)
@@ -322,26 +327,38 @@ library(dplyr)
 # Create a categorical variable for Median Household Income
 breaks <- c(-Inf, 50000, 70000, Inf)  # Define income groups
 labels <- c("Low", "Medium", "High")  # Corresponding labels
-data$Income_Group <- cut(data$`Median Household Income (Age 5-17 in Families)`, breaks = breaks, labels = labels, include.lowest = TRUE)
+data$Income_Group <- cut(data$Median Household Income (Age 5-17 in Families), breaks = breaks, labels = labels, include.lowest = TRUE)
 
 # Remove rows with NA values
 data <- na.omit(data)
 
 # Perform Chi-Square Test of Independence
-chi_result <- chisq.test(table(data$Income_Group, data$`Poverty Percent (All Ages)`))
+chi_result <- chisq.test(table(data$Income_Group, data$Poverty Percent (All Ages)))
 
 # Print the result
 print(chi_result)
 
 # Create a contingency table for visualization purposes
-chi_table <- table(data$Income_Group, data$`Poverty Percent (All Ages)`)
+chi_table <- table(data$Income_Group, data$Poverty Percent (All Ages))
 
 # Print the contingency table
 print(chi_table)
 
 
 
+# Scatterplot with Linear Trendline
+scatterplot <- ggplot(data, aes(x = Median Household Income (Age 5-17 in Families), y = Poverty Percent (All Ages))) +
+  geom_point(color = "blue", alpha = 0.7) +
+  geom_smooth(method = "lm", color = "red", se = TRUE) +
+  labs(
+    title = "Scatterplot of Poverty Percent vs Median Household Income",
+    x = "Median Household Income (Age 5-17 in Families)",
+    y = "Poverty Percent (All Ages)"
+  ) +
+  theme_minimal()
 
+# Save the scatterplot as a PNG file
+ggsave("scatterplot_poverty_vs_income.png", plot = scatterplot, width = 8, height = 6, dpi = 300)
 
-
-
+# Print the scatterplot to the console (optional)
+print(scatterplot)
