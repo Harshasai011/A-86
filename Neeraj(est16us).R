@@ -23,7 +23,7 @@ data <- data[-1, ]
 
 head(data)
 
-# Rename the columns as specified
+
 colnames(data) <- c(
   "State FIPS Code",
   "Postal Code",
